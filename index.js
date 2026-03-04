@@ -8,7 +8,17 @@ const offerRoutes = require('./routes/offer');
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+const allowedOrigins = ['http://localhost:5173', 'https://offer-editor-frontend.onrender.com']; // Assuming this might be the frontend URL
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
