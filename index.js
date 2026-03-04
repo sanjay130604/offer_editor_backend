@@ -8,16 +8,27 @@ const offerRoutes = require('./routes/offer');
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:5173', 'https://offer-editor-frontend.onrender.com']; // Assuming this might be the frontend URL
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://offer-editor-frontend.onrender.com',
+    'https://offer-editor-frontend.onrender.com/'
+];
+
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        console.log('Incoming Origin:', origin);
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
+            console.error('Origin not allowed by CORS:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
