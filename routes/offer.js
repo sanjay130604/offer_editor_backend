@@ -16,7 +16,7 @@ router.post('/save', protect, async (req, res) => {
 // POST /api/offer/send-email — send offer letter via Brevo API (protected)
 router.post('/send-email', protect, async (req, res) => {
     try {
-        const { toEmail, candidateName, joiningDate, pdfBase64, customSubject, customMailContent } = req.body;
+        const { toEmail, candidateName, joiningDate, pdfBase64, customSubject, customMailContent, customFileName } = req.body;
         const fromEmail = req.admin?.email;
 
         const missing = [];
@@ -71,19 +71,21 @@ VTab Pvt. Ltd.
         console.log(`PDF Attachment Size: ${Math.round(base64Content.length * 0.75 / 1024)} KB`);
 
         const brevoPayload = {
-            sender: { name: "VTAB SQUARE Admin", email: "balamuraleee@gmail.com" },
+            sender: { name: "VTAB SQUARE Admin", email: process.env.EMAIL_USER || "balamuraleee@gmail.com" },
             replyTo: { email: fromEmail, name: "HR Team" },
             to: [{ email: toEmail, name: candidateName }],
-            cc: [
-                { email: "balamuraleee@gmail.com", name: "Bala Muralee" },
-                { email: "vigneshrajas.vtab@gmail.com", name: "Vignesh Rajas" }
-            ],
+            // cc: [
+            //     { email: "balamuraleee@gmail.com", name: "Bala Muralee" },
+            //     { email: "vigneshrajas.vtab@gmail.com", name: "Vignesh Rajas" }
+            // ],
             subject: customSubject || "Congratulations! Your Documents have been Verified - VTab Pvt. Ltd.",
             textContent: mailContent,
             attachment: [
                 {
                     content: base64Content,
-                    name: `${customSubject?.replace(/\s+/g, '_') || 'Letter'}_${candidateName.replace(/\s+/g, '_')}.pdf`
+                    name: customFileName
+                        ? (customFileName.toLowerCase().endsWith('.pdf') ? customFileName : `${customFileName}.pdf`)
+                        : `${customSubject?.replace(/[^\w\s-]/g, '').replace(/\s+/g, '_') || 'Letter'}_${candidateName.replace(/\s+/g, '_')}.pdf`
                 }
             ]
         };
