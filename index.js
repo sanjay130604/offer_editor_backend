@@ -11,7 +11,11 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:5173',
     'https://offer-editor-frontend.onrender.com',
-    'https://offer-editor-frontend.onrender.com/'
+    'https://offer-editor-frontend.onrender.com/',
+    'https://offergenerator.vtabsquare.com',
+    'https://offergenerator.vtabsquare.com/',
+    'https://officeportal.vtabsquare.com',
+    'https://officeportal.vtabsquare.com/'
 ];
 
 app.use(cors({
@@ -23,7 +27,7 @@ app.use(cors({
             callback(null, true);
         } else {
             console.error('Origin not allowed by CORS:', origin);
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false); // Return false instead of Error object
         }
     },
     credentials: true,
